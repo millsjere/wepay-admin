@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Link, Avatar, Button, Card, CardContent, Chip, IconButton, InputAdornment, TextField, Typography, Popover, MenuItem, Hidden, Box } from '@material-ui/core';
-import { Add, Create, Search, Tune } from '@material-ui/icons';
+import { Link, Avatar, Button, Card, CardContent, Chip, IconButton, InputAdornment, TextField, Typography, Popover, MenuItem, Hidden, Box, Tooltip, Dialog, DialogContent, DialogActions } from '@material-ui/core';
+import { Add, Create, Delete, Search, Tune } from '@material-ui/icons';
 import { DataGrid } from '@material-ui/data-grid'
 import { makeStyles } from '@material-ui/styles';
 import PageHeader from '../../components/PageHeader';
 import { connect } from 'react-redux'
-import { getAllUsers, successModal, fetchVerifiedUsers } from '../../actions/actions';
+import { getAllUsers, successModal, fetchVerifiedUsers, axiosInstance } from '../../actions/actions';
 import Modal from '../../components/Modal';
+import swal from 'sweetalert'
 
 
 const useStyles = makeStyles(theme => ({
@@ -87,6 +88,35 @@ const AllUsers = (props) => {
     }
   }
 
+  const onUserDelete = (id) => {
+    swal({
+      title: 'Are You Sure',
+      text: 'This action will delete all records of this user',
+      icon: 'info',
+      buttons: ['Cancel', 'Delete'],
+      dangerMode: true
+    }).then(async (del) => {
+      if (del) {
+        try {
+          const { data: res } = await axiosInstance.post('/admin/user/delete', { id })
+          if (res?.status === 'success') {
+            swal({
+              title: 'Success',
+              text: 'User deleted successfully',
+              icon: 'success'
+            }).then(() => window.location.reload())
+          }
+        } catch (error) {
+          swal({
+            title: 'Error',
+            text: 'Sorry, could not delete user',
+            icon: 'error'
+          })
+        }
+      }
+    })
+  }
+
 
   const columns = [
     {
@@ -103,12 +133,13 @@ const AllUsers = (props) => {
     },
     { field: 'email', headerName: 'Email', flex: 1 },
     { field: 'phone', headerName: 'Phone', flex: .5 },
-    { field: 'status', headerName: ' Status', flex: .5, renderCell: (params) => { return <Chip disabled label={params.value} /> } },
+    { field: 'status', headerName: ' Status', flex: .5, renderCell: (params) => { return <Chip size='small' color={params.value === 'Approved' ? 'secondary' : params.value === 'Verified' ? 'primary' : 'default'} label={params.value} /> } },
     {
       field: 'id', headerName: ' Action', flex: .5, renderCell: (params) => {
         return (
           <>
-            <Link href={`/account/users/${params.value}/edit`} ><IconButton ><Create fontSize='small' /></IconButton></Link>
+            <Tooltip title='Edit'><Link href={`/account/users/${params.value}/edit`} ><IconButton ><Create fontSize='small' /></IconButton></Link></Tooltip>
+            <Tooltip title='Delete'><IconButton onClick={() => { onUserDelete(params?.value) }}><Delete fontSize='small' /></IconButton></Tooltip>
           </>
         )
       }
@@ -123,6 +154,7 @@ const AllUsers = (props) => {
         return (
           <>
             <Link href={`/account/users/${params.value}/edit`} ><IconButton ><Create fontSize='small' /></IconButton></Link>
+            <IconButton onClick={() => { }}><Delete fontSize='small' /></IconButton>
           </>
         )
       }
@@ -180,7 +212,7 @@ const AllUsers = (props) => {
             <MenuItem onClick={() => filterUsers('Verified')} >Verified</MenuItem>
             <MenuItem onClick={() => filterUsers('Approved')} >Approved</MenuItem>
             <MenuItem onClick={() => filterUsers('Active')} >Active</MenuItem>
-            <MenuItem onClick={() => filterUsers('Inactive')} >Inactive.</MenuItem>
+            <MenuItem onClick={() => filterUsers('Inactive')} >Inactive</MenuItem>
           </CardContent>
         </Card>
       </Popover>

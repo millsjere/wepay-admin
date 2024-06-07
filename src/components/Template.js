@@ -203,7 +203,7 @@ const Template = ({ currentUser }) => {
 
                         <View>
                             <Text style={[styles.paragraph, { margin: '0px' }]}>
-                                I, the undersigned, hereby authorizes Forbes Microfinance to deduct/withdraw 10gh from my account below for account verification and wepay card activation.
+                                I, the undersigned, hereby authorizes Forbes Microfinance to deduct/withdraw 50gh from my account below for account verification and wepay card activation.
                             </Text>
                             <View style={{ flex: 1, display: 'flex', flexDirection: 'row', gap: 10, marginTop: '10px' }}>
                                 <Text style={styles.label}>SIGNATURE:</Text>

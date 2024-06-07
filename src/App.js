@@ -10,6 +10,8 @@ import Loader from './components/Loader'
 import { getAuth } from './actions/actions'
 import Errorpage from './Pages/ErrorPage'
 // import UserEdit from './Pages/users/UserEdit'
+import './App.css'
+
 
 const useStyles = makeStyles(theme => ({
   root: {
